@@ -1,6 +1,8 @@
 const http=require('http'),fs=require('fs'),path=require('path'),{WebSocketServer}=require('ws'),Game=require('./game.js');
 const page=fs.existsSync(path.join(__dirname,'index.html'))?path.join(__dirname,'index.html'):path.join(__dirname,'public','index.html');
-let PAGE=fs.readFileSync(page,'utf8').replace(/const ws=tm=>/g,'const wsf=tm=>').replace(/\bws\((u\.team|-1)\)/g,'wsf($1)');
+const OLD_ONL="g.u.forEach((u,i)=>{const d=DP[i];if(Math.hypot(u.tx-d.x,u.ty-d.y)>150){d.x=u.tx;d.y=u.ty}else{const k=Math.min(1,dt*18);d.x+=(u.tx-d.x)*k;d.y+=(u.ty-d.y)*k}u.x=d.x;u.y=d.y});";
+const NEW_ONL="g.u.forEach((u,i)=>{const d=DP[i];if(i==ME&&u.alive){const ix=IN.mx+(kd.d||kd.arrowright?1:0)-(kd.a||kd.arrowleft?1:0),iy=IN.my+(kd.s||kd.arrowdown?1:0)-(kd.w||kd.arrowup?1:0);const l=Math.hypot(ix,iy);if(l>.1){const sp=B[u.bi].sp*(u.hT>0?1.15:1)*dt;d.x+=ix/Math.max(1,l)*sp;d.y+=iy/Math.max(1,l)*sp;const q={x:d.x,y:d.y,r:u.r,team:u.team};coll(q);d.x=q.x;d.y=q.y}if(Math.hypot(u.tx-d.x,u.ty-d.y)>160){d.x=u.tx;d.y=u.ty}}else if(Math.hypot(u.tx-d.x,u.ty-d.y)>150){d.x=u.tx;d.y=u.ty}else{const k=Math.min(1,dt*18);d.x+=(u.tx-d.x)*k;d.y+=(u.ty-d.y)*k}u.x=d.x;u.y=d.y});";
+let PAGE=fs.readFileSync(page,'utf8').replace(/const ws=tm=>/g,'const wsf=tm=>').replace(/\bws\((u\.team|-1)\)/g,'wsf($1)').split(OLD_ONL).join(NEW_ONL);
 const srv=http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});r.end(PAGE)});
 const wss=new WebSocketServer({server:srv});
 const rooms={};
