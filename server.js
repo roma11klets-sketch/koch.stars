@@ -12,13 +12,13 @@ function lobby(r){r.p.forEach((p,i)=>send(p.ws,{t:'lobby',code:r.code,mode:r.mod
 function chat(r,n,m){if(!m)return;r.chat=(r.chat||[]).concat([{n,m}]).slice(-40);r.p.forEach(p=>send(p.ws,{t:'chat',msgs:r.chat}))}
 wss.on('connection',ws=>{let room=null,me=null;
 ws.on('message',d=>{let m;try{m=JSON.parse(d)}catch(e){return}
-const bi=Math.max(0,Math.min(3,m.bi|0));const name=clean(m.name,14)||'Игрок';
-if(m.t=='create'&&!room){const code=Math.random().toString(36).slice(2,6).toUpperCase();room=rooms[code]={code,mode:0,p:[],G:null,chat:[]};me={ws,bi,name,team:0};room.p.push(me);lobby(room);send(ws,{t:'chat',msgs:room.chat});return}
+const bi=Math.max(0,Math.min(5,m.bi|0));const lv=Math.max(1,Math.min(10,m.lv|0||1));const name=clean(m.name,14)||'Игрок';
+if(m.t=='create'&&!room){const code=Math.random().toString(36).slice(2,6).toUpperCase();room=rooms[code]={code,mode:0,p:[],G:null,chat:[]};me={ws,bi,name,team:0,lv};room.p.push(me);lobby(room);send(ws,{t:'chat',msgs:room.chat});return}
 if(m.t=='join'&&!room){const r=rooms[clean(m.code,4).toUpperCase()];if(!r)return send(ws,{t:'err',m:'Комната не найдена'});if(r.G)return send(ws,{t:'err',m:'Матч уже идёт'});if(r.p.length>=6)return send(ws,{t:'err',m:'Комната заполнена'});
-room=r;let t=teamN(r,0)<=teamN(r,1)?0:1;if(teamN(r,t)>=3)t=1-t;me={ws,bi,name,team:t};r.p.push(me);lobby(r);send(ws,{t:'chat',msgs:r.chat||[]});return}
+room=r;let t=teamN(r,0)<=teamN(r,1)?0:1;if(teamN(r,t)>=3)t=1-t;me={ws,bi,name,team:t,lv};r.p.push(me);lobby(r);send(ws,{t:'chat',msgs:r.chat||[]});return}
 if(!room)return;
-if(m.t=='pick'&&!room.G){me.bi=bi;lobby(room)}
-else if(m.t=='mode'&&room.p[0]===me&&!room.G){room.mode=[0,1,2].includes(m.mode)?m.mode:0;lobby(room)}
+if(m.t=='pick'&&!room.G){me.bi=bi;me.lv=lv;lobby(room)}
+else if(m.t=='mode'&&room.p[0]===me&&!room.G){room.mode=[0,1,2,3].includes(m.mode)?m.mode:0;lobby(room)}
 else if(m.t=='team'&&!room.G&&room.mode!=1){const t=1-me.team;if(teamN(room,t)>=3)return send(ws,{t:'err',m:'В этой команде уже 3 игрока'});me.team=t;lobby(room)}
 else if(m.t=='chat'){chat(room,me.name,clean(m.m,100))}
 else if(m.t=='start'&&room.p[0]===me&&!room.G){Game.start(room);room.p.forEach(p=>send(p.ws,{t:'start',mode:room.mode,idx:p.id,m:room.G.m}))}
