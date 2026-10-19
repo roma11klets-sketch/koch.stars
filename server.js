@@ -1,5 +1,5 @@
 const http=require('http'),fs=require('fs'),path=require('path'),{WebSocketServer}=require('ws'),Game=require('./game.js');
-const page=path.join(__dirname,'public','index.html');
+const page=path.join(__dirname,'index.html');
 const srv=http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});r.end(fs.readFileSync(page))});
 const wss=new WebSocketServer({server:srv});
 const rooms={};
