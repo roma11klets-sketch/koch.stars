@@ -1,6 +1,7 @@
 const http=require('http'),fs=require('fs'),path=require('path'),{WebSocketServer}=require('ws'),Game=require('./game.js');
-const page=path.join(__dirname,'index.html');
-const srv=http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});r.end(fs.readFileSync(page))});
+const page=path.join(__dirname,'public','index.html');
+let PAGE=fs.readFileSync(page,'utf8').replace(/const ws=tm=>/g,'const wsf=tm=>').replace(/\bws\((u\.team|-1)\)/g,'wsf($1)');
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});r.end(PAGE)});
 const wss=new WebSocketServer({server:srv});
 const rooms={};
 const send=(w,o)=>{if(w.readyState==1)w.send(typeof o=='string'?o:JSON.stringify(o))};
